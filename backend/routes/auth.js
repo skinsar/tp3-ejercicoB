@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-
 const authController = require('../controllers/authController');
+
 
 router.post(
     '/register',
@@ -15,4 +15,14 @@ router.post(
     authController.register
 );
 
-module.exports= router;
+router.post(
+    '/login',
+    [
+        body('email', 'Por favor incluya un email válido').isEmail(),
+        body('password', 'La contraseña es requerida').exists(),
+    ],
+    
+    authController.login
+);
+
+module.exports = router;

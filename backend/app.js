@@ -11,16 +11,14 @@ const app = express();
 
 //Configurar Middlewares
 app.use(cors());
-
-
 app.use(express.json()); 
 
-// Rutas de prueba
+// Rutas de prueba (De la Fase 2)
 app.get('/', (req, res) => {
     res.send ('API del Sistema de Citas Médicas funcionando');
 });
 
-// Ruta de prueba de base de datos
+// Ruta de prueba de base de datos (De la Fase 2)
 app.get('/ping', async (req, res) => {
     try {
         const [result] = await pool.query('SELECT "pong" AS result');
@@ -30,6 +28,9 @@ app.get('/ping', async (req, res) => {
         res.status(500).send('Error al conectar con la base de datos');
     }
 });
+
+// Conectar las rutas de autenticación
+app.use('/api/auth', require('./routes/auth'));
 
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
