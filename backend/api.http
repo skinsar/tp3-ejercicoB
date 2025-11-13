@@ -1,9 +1,92 @@
-### Registrar un nuevo usuario
-POST http://localhost:5000/api/auth/register
+@baseUrl = http://localhost:5000/api
+@authToken = 
+
+###
+
+# FASE 1: Autenticación
+
+
+### 
+# Registrar un nuevo usuario
+POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-    "email": "test@example.com",
-    "password": "password123",
-    "role": "user"
+    "email": "hernanbarrera@gmail.com",
+    "password": "12345678Hb",
+    "role": "admin"
+}
+
+###
+# Iniciar sesión para obtener token
+# @name loginRequest
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "hernanbarrera@gmail.com",
+    "password": "12345678Hb"
+}
+
+###
+# Captura el token de la respuesta para usarlo después
+@authToken = {{loginRequest.response.body.token}}
+
+###
+# Rutas Protegidas
+
+###
+# Obtener todas las citas falla sin token
+
+GET {{baseUrl}}/appointments
+
+###
+# Obtener todas las citas con token
+GET {{baseUrl}}/appointments
+Authorization: Bearer {{authToken}} [3, 4, 5]
+
+###
+# Crear un Paciente
+# @name createPatient
+POST {{baseUrl}}/patients
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "first_name": "Nico",
+    "last_name": "Otamendi",
+    "dni":"29897372"
+}
+
+###
+# Captura el ID del paciente recién creado
+@patientId = {{createPatient.response.body.id}}
+
+###
+# Crear un Medico
+# @name createDoctor
+POST {{baseUrl}}/doctors
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "first_name": "Maria",
+    "last_name": "Gomez",
+    "specialty": "Cardiología"
+}
+
+###
+# Captura el ID del médico recién creado
+@doctorId = {{createDoctor.response.body.id}}
+
+###
+# Crear una Cita (usando IDs capturados)
+POST {{baseUrl}}/appointments
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+    "patient_id": {{patientId}},
+    "doctor_id": {{doctorId}},
+    "appointment_date":"2024-12-01T14:00:00"
 }
