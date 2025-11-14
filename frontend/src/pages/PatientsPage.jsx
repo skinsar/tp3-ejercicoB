@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import PatientModal from '../components/PatientModal';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const PatientsPage = () => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
+    const [patientToDelete, setPatientToDelete] = useState(null);
 
     useEffect(() => {
         const fetchPatients = async () => {
@@ -23,37 +25,53 @@ const PatientsPage = () => {
             setLoading(false);
         }
         };
-
         fetchPatients();
     }, []);
 
-
     const handleCreate = () => {
         setSelectedPatient(null);
-        setIsModalOpen(true);
+        setIsEditModalOpen(true);
     };
-
     const handleEdit = (patient) => {
-        setSelectedPatient(patient); 
-        setIsModalOpen(true);
+        setSelectedPatient(patient);
+        setIsEditModalOpen(true);
     };
-
-// Cierra el modal
-    const handleClose = () => {
-        setIsModalOpen(false);
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
         setSelectedPatient(null);
     };
-
-//Función onSave que se pasa al modal
     const handleSave = (savedPatient) => {
         if (selectedPatient) {
-        setPatients(patients.map(p => 
-            p.id === savedPatient.id ? savedPatient : p
-        ));
+        setPatients(patients.map(p => (p.id === savedPatient.id ? savedPatient : p)));
         } else {
         setPatients([...patients, savedPatient]);
         }
-        handleClose();
+        handleCloseEditModal();
+    };
+
+    const handleDelete = (patientId) => {
+        setPatientToDelete(patientId);
+    };
+
+    const handleCloseDeleteModal = () => {
+        setPatientToDelete(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+// Llama a la API del backend
+        await api.delete(`/patients/${patientToDelete}`);
+        
+// Actualiza la lista del frontend
+        setPatients(patients.filter(p => p.id !== patientToDelete));
+        
+// Cierra el modal
+        handleCloseDeleteModal();
+        } catch (error) {
+        console.error('Error al eliminar el paciente:', error);
+        setError(error.message);
+        handleCloseDeleteModal();
+        }
     };
 
     if (loading) return <div>Cargando pacientes...</div>;
@@ -63,7 +81,6 @@ const PatientsPage = () => {
         <div>
         <h2>Gestión de Pacientes</h2>
         
-        {/* botón Crear*/}
         <button className="btn" onClick={handleCreate} style={{ marginBottom: '1rem' }}>
             Crear Nuevo Paciente
         </button>
@@ -90,10 +107,15 @@ const PatientsPage = () => {
                     <td>{patient.last_name}</td>
                     <td>{patient.dni}</td>
                     <td>{patient.phone || 'N/A'}</td>
-                    <td>
-                    {/*botón de Editar*/}
+                    
+                    {}
+                    <td className="actions-cell">
                     <button className="btn btn-secondary" onClick={() => handleEdit(patient)}>
                         Editar
+                    </button>
+                    {}
+                    <button className="btn btn-danger" onClick={() => handleDelete(patient.id)}>
+                        Eliminar
                     </button>
                     </td>
                 </tr>
@@ -102,13 +124,21 @@ const PatientsPage = () => {
             </tbody>
         </table>
 
-        {/* Renderizar el modal*/}
-        {/* Solo se muestra si isModalOpen es true */}
-        {isModalOpen && (
+        {}
+        {isEditModalOpen && (
             <PatientModal
             patientToEdit={selectedPatient}
-            onClose={handleClose}
+            onClose={handleCloseEditModal}
             onSave={handleSave}
+            />
+        )}
+        {}
+        {}
+        {patientToDelete && (
+            <ConfirmationModal
+            message="¿Estás seguro de que deseas eliminar este paciente? Esta acción no se puede deshacer."
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCloseDeleteModal}
             />
         )}
         </div>

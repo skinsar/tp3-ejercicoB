@@ -293,3 +293,23 @@ body {
   margin: 0 auto;
   box-sizing: border-box;
 }
+
+.btn-danger {
+  background-color: #dc3545;
+  width: auto;
+  padding: 0.75rem 1.25rem;
+}
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actions-cell .btn {
+  width: auto;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
