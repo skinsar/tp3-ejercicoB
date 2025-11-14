@@ -13,12 +13,12 @@ const MainLayout = () => {
                 Sistema de Citas Médicas
             </Link>
             
-            {/* Mostramos la navegación solo si el usuario está logueado */}
+            {/* Mostramos la navegacion solo si el usuario está logueado */}
             {token && (
                 <nav className="app-nav">
                 <Link to="/appointments">Citas</Link>
                 <Link to="/patients">Pacientes</Link>
-                {/*<Link to="/doctors">Médicos</*/}
+                <Link to="/doctors">Médicos</Link>
                 <button onClick={logout} className="btn btn-secondary btn-logout">
                     Cerrar Sesión
                 </button>

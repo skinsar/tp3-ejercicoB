@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import PatientsPage from './pages/PatientsPage';
+import DoctorsPage from './pages/DoctorsPage';
 
 // Configuración de las rutas
 const router = createBrowserRouter([
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
           {
             path: '/patients',
             element: <PatientsPage />,
+          },
+          {
+            path: '/doctors',
+            element: <DoctorsPage />,
           },
         ],
       },
