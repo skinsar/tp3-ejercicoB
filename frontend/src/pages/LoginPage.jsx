@@ -1,10 +1,8 @@
-// Contenido para: frontend/src/pages/LoginPage.jsx
-
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form'; // Para manejar el formulario
-import { useNavigate } from 'react-router-dom'; // Para redirigir
-import { useAuth } from '../context/AuthContext'; // Nuestro "cerebro"
-import { api } from '../services/api'; // Nuestro "mensajero"
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api'; 
 
 const LoginPage = () => {
   // Hooks que usaremos

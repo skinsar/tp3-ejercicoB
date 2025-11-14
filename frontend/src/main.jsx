@@ -7,14 +7,9 @@ import MainLayout from './components/MainLayout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import AppointmentsPage from './pages/AppointmentsPage';
-
-// guardia de seguridad
+import NewAppointmentPage from './pages/NewAppointmentPage';
 import ProtectedRoute from './components/ProtectedRoute';
-
-// Importa CSS
 import './index.css';
-
-// Importa AuthProvider
 import { AuthProvider } from './context/AuthContext';
 
 // Configuración de las rutas
@@ -39,6 +34,10 @@ const router = createBrowserRouter([
           {
             path: '/appointments',
             element: <AppointmentsPage />,
+          },
+          {
+            path: '/appointments/new',
+            element: <NewAppointmentPage />,
           },
         ],
       },
