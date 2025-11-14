@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { api } from '../services/api';
 
 const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    console.log('--- DoctorModal RENDERIZADO ---', { doctorToEdit });
 
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    
+    const [apiError, setApiError] = useState(null);
     const isEditMode = Boolean(doctorToEdit);
 
     useEffect(() => {
+        setApiError(null); 
         if (isEditMode) {
         reset(doctorToEdit);
         } else {
@@ -20,6 +24,8 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
     }, [doctorToEdit, reset, isEditMode]);
 
     const onSubmit = async (data) => {
+        console.log('--- onSubmit LLAMADO ---', data);
+        setApiError(null); 
         try {
         let savedDoctor;
         if (isEditMode) {
@@ -30,13 +36,14 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
         } else {
             savedDoctor = await api.post('/doctors', data);
         }
-        
-        onSave(savedDoctor);
-
+        onSave(savedDoctor); 
         } catch (error) {
-        console.error('Error al guardar el médico:', error);
+        console.error('Error al guardar el médico (API):', error);
+        setApiError(error.message || 'Error al guardar. Intente de nuevo.');
         }
     };
+
+    console.log('ERRORES DE FORMULARIO:', errors);
 
     return (
         <div className="modal-backdrop" onClick={onClose}>
@@ -70,6 +77,8 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
                 {errors.specialty && <p className="error-message">{errors.specialty.message}</p>}
             </div>
 
+            {apiError && <p className="error-message">{apiError}</p>}
+            
             <div className="modal-actions">
                 <button type="submit" className="btn">
                 {isEditMode ? 'Guardar Cambios' : 'Crear Médico'}
