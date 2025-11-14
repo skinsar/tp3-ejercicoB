@@ -1,23 +1,35 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const MainLayout = () => {
+    const { token, logout } = useAuth(); //token y logout
+
     return (
-        <div className="main-layout">
-        <nav>
-            <h1>Sistema de Citas Médicas</h1>
-            {/* Enlaces de navegación vendran por acá*/}
-        </nav>
+        <div className="app-container">
+        <header className="app-header">
+            <div className="header-content">
+            <Link to="/" className="logo">
+                Sistema de Citas Médicas
+            </Link>
+            
+            {/* Mostramos la navegación solo si el usuario está logueado */}
+            {token && (
+                <nav className="app-nav">
+                <Link to="/appointments">Citas</Link>
+                <Link to="/patients">Pacientes</Link>
+                {/*<Link to="/doctors">Médicos</*/}
+                <button onClick={logout} className="btn btn-secondary btn-logout">
+                    Cerrar Sesión
+                </button>
+                </nav>
+            )}
+            </div>
+        </header>
         
-        <main>
-            {/**/}
-            {/**/}
+        <main className="main-content">
             <Outlet />
         </main>
-        
-        <footer>
-            <p>© 2025 Programación IV</p>
-        </footer>
         </div>
     );
 };

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../services/api'; 
+import { api } from '../services/api';
+import AppointmentEditModal from '../components/AppointmentEditModal';
 
 const AppointmentsPage = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const [editingAppointment, setEditingAppointment] = useState(null);
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -21,17 +24,20 @@ const AppointmentsPage = () => {
             setLoading(false);
         }
         };
-
         fetchAppointments();
     }, []);
 
-    if (loading) {
-        return <div>Cargando citas...</div>;
-    }
+    const handleSave = (updatedAppointment) => {
+        setAppointments((currentAppointments) =>
+        currentAppointments.map((appt) =>
+            appt.id === updatedAppointment.id ? updatedAppointment : appt
+        )
+        );
+        setEditingAppointment(null);
+    };
 
-    if (error) {
-        return <div style={{ color: 'red' }}>Error: {error}</div>;
-    }
+    if (loading) return <div>Cargando citas...</div>;
+    if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
 
     return (
         <div>
@@ -49,36 +55,45 @@ const AppointmentsPage = () => {
                 <th>Especialidad</th>
                 <th>Fecha</th>
                 <th>Estado</th>
-                {/* <th>Acciones</th> */}
+                {/*columna de Acciones*/}
+                <th>Acciones</th>
             </tr>
             </thead>
             <tbody>
-            {/* Si no hay citas, mostramos un mensaje */}
             {appointments.length === 0 ? (
-                <tr>
-                <td colSpan="6" style={{ textAlign: 'center' }}>
-                    No hay citas registradas.
-                </td>
-                </tr>
+                <tr><td colSpan="7" style={{ textAlign: 'center' }}>No hay citas.</td></tr>
             ) : (
                 appointments.map((appt) => (
                 <tr key={appt.id}>
                     <td>{appt.id}</td>
-                    {/* Usamos los datos del join del backend */}
                     <td>{appt.patient_first_name} {appt.patient_last_name}</td>
                     <td>{appt.doctor_first_name} {appt.doctor_last_name}</td>
                     <td>{appt.specialty}</td>
-                    {/* Formateamos la fecha para que sea legible */}
                     <td>{new Date(appt.appointment_date).toLocaleString()}</td>
                     <td>{appt.status}</td>
-                    {/* <td>
-                    <button>Editar</button>
-                    </td> */}
+                    {/*botón de Editar*/}
+                    {/*clic, cita en el estado editingAppointment */}
+                    <td>
+                    <button 
+                        className="btn btn-secondary" 
+                        onClick={() => setEditingAppointment(appt)}
+                    >
+                        Editar
+                    </button>
+                    </td>
                 </tr>
                 ))
             )}
             </tbody>
         </table>
+
+        {/*Renderizar el modal*/}
+        {/*mostrará si editingAppointment no es null*/}
+        <AppointmentEditModal
+            appointment={editingAppointment}
+            onClose={() => setEditingAppointment(null)}
+            onSave={handleSave}
+        />
         </div>
     );
 };

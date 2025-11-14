@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
 //componentes
 import MainLayout from './components/MainLayout';
 import HomePage from './pages/HomePage';
@@ -11,6 +10,7 @@ import NewAppointmentPage from './pages/NewAppointmentPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 import { AuthProvider } from './context/AuthContext';
+import PatientsPage from './pages/PatientsPage';
 
 // Configuración de las rutas
 const router = createBrowserRouter([
@@ -38,6 +38,10 @@ const router = createBrowserRouter([
           {
             path: '/appointments/new',
             element: <NewAppointmentPage />,
+          },
+          {
+            path: '/patients',
+            element: <PatientsPage />,
           },
         ],
       },
