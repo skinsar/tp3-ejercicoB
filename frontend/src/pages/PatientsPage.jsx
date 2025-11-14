@@ -7,39 +7,44 @@ const PatientsPage = () => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [patientToDelete, setPatientToDelete] = useState(null);
 
     useEffect(() => {
-        const fetchPatients = async () => {
-        try {
-            setLoading(true);
-            const data = await api.get('/patients');
-            setPatients(data);
-            setError(null);
-        } catch (err) {
-            console.error('Error al obtener pacientes:', err);
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-        };
         fetchPatients();
     }, []);
+
+    const fetchPatients = async () => {
+        try {
+        setLoading(true);
+        const data = await api.get('/patients');
+        setPatients(data);
+        setError(null);
+        } catch (err) {
+        console.error('Error al obtener pacientes:', err);
+        setError(err.message);
+        } finally {
+        setLoading(false);
+        }
+    };
 
     const handleCreate = () => {
         setSelectedPatient(null);
         setIsEditModalOpen(true);
     };
+
     const handleEdit = (patient) => {
         setSelectedPatient(patient);
         setIsEditModalOpen(true);
     };
+
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setSelectedPatient(null);
     };
+
     const handleSave = (savedPatient) => {
         if (selectedPatient) {
         setPatients(patients.map(p => (p.id === savedPatient.id ? savedPatient : p)));
@@ -59,13 +64,8 @@ const PatientsPage = () => {
 
     const handleConfirmDelete = async () => {
         try {
-// Llama a la API del backend
         await api.delete(`/patients/${patientToDelete}`);
-        
-// Actualiza la lista del frontend
         setPatients(patients.filter(p => p.id !== patientToDelete));
-        
-// Cierra el modal
         handleCloseDeleteModal();
         } catch (error) {
         console.error('Error al eliminar el paciente:', error);
@@ -73,6 +73,15 @@ const PatientsPage = () => {
         handleCloseDeleteModal();
         }
     };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        // Ajusta la zona horaria (new Date() puede interpretar mal YYYY-MM-DD)
+        const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+        return utcDate.toLocaleDateString('es-AR'); // Formato DD/MM/YYYY
+    };
+
 
     if (loading) return <div>Cargando pacientes...</div>;
     if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
@@ -92,13 +101,14 @@ const PatientsPage = () => {
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>DNI</th>
-                <th>Teléfono</th>
+                <th>Fecha Nac.</th>
+                <th>Obra Social</th>
                 <th>Acciones</th>
             </tr>
             </thead>
             <tbody>
             {patients.length === 0 ? (
-                <tr><td colSpan="6" style={{ textAlign: 'center' }}>No hay pacientes.</td></tr>
+                <tr><td colSpan="7" style={{ textAlign: 'center' }}>No hay pacientes.</td></tr>
             ) : (
                 patients.map((patient) => (
                 <tr key={patient.id}>
@@ -106,14 +116,12 @@ const PatientsPage = () => {
                     <td>{patient.first_name}</td>
                     <td>{patient.last_name}</td>
                     <td>{patient.dni}</td>
-                    <td>{patient.phone || 'N/A'}</td>
-                    
-                    {}
+                    <td>{formatDate(patient.fecha_nacimiento)}</td>
+                    <td>{patient.obra_social || 'N/A'}</td>
                     <td className="actions-cell">
                     <button className="btn btn-secondary" onClick={() => handleEdit(patient)}>
                         Editar
                     </button>
-                    {}
                     <button className="btn btn-danger" onClick={() => handleDelete(patient.id)}>
                         Eliminar
                     </button>
@@ -124,7 +132,6 @@ const PatientsPage = () => {
             </tbody>
         </table>
 
-        {}
         {isEditModalOpen && (
             <PatientModal
             patientToEdit={selectedPatient}
@@ -132,8 +139,7 @@ const PatientsPage = () => {
             onSave={handleSave}
             />
         )}
-        {}
-        {}
+
         {patientToDelete && (
             <ConfirmationModal
             message="¿Estás seguro de que deseas eliminar este paciente? Esta acción no se puede deshacer."
@@ -143,6 +149,6 @@ const PatientsPage = () => {
         )}
         </div>
     );
-};
+    };
 
 export default PatientsPage;

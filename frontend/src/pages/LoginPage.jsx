@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../services/api'; 
+import { api } from '../services/api';
 
 const LoginPage = () => {
-  // Hooks que usaremos
     const {
         register,
         handleSubmit,
@@ -16,17 +15,12 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [apiError, setApiError] = useState(null);
 
-
     const onSubmit = async (data) => {
         setApiError(null);
         try {
-        
         const response = await api.post('/auth/login', data);
-
         login(response.token);
-
         navigate('/appointments');
-
         } catch (error) {
         console.error('Error de inicio de sesión:', error);
         setApiError(error.message || 'Credenciales inválidas');
@@ -37,7 +31,6 @@ const LoginPage = () => {
         <div className="form-container">
         <h2>Iniciar Sesión</h2>
         
-        {/* handleSubmit se encarga de la validación antes de llamar a onSubmit */}
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className="form-group">
             <label>Email</label>
@@ -57,13 +50,17 @@ const LoginPage = () => {
             {errors.password && <p className="error-message">{errors.password.message}</p>}
             </div>
 
-            {/* Aquí mostramos errores del backend */}
             {apiError && <p className="error-message">{apiError}</p>}
 
             <button type="submit" className="btn">Iniciar Sesión</button>
+
+            {}
+            <div className="form-footer">
+            <p>¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link></p>
+            </div>
         </form>
         </div>
     );
-};
+    };
 
 export default LoginPage;

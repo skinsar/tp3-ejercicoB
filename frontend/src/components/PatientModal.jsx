@@ -1,31 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { api } from '../services/api';
 
 const PatientModal = ({ patientToEdit, onClose, onSave }) => {
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
-
+    const [apiError, setApiError] = useState(null);
+    
     const isEditMode = Boolean(patientToEdit);
 
     useEffect(() => {
+        setApiError(null);
         if (isEditMode) {
-        reset(patientToEdit);
+        const formattedDate = patientToEdit.fecha_nacimiento 
+            ? new Date(patientToEdit.fecha_nacimiento).toISOString().split('T')[0] 
+            : '';
+        reset({ ...patientToEdit, fecha_nacimiento: formattedDate });
         } else {
         reset({
             first_name: '',
             last_name: '',
             dni: '',
-            phone: ''
+            fecha_nacimiento: '',
+            obra_social: ''
         });
         }
     }, [patientToEdit, reset, isEditMode]);
 
-// Se llama al hacer clic en "Guardar"
     const onSubmit = async (data) => {
+        setApiError(null);
         try {
         let savedPatient;
         if (isEditMode) {
-// Llamamos a la API con PUT para actualizar
             savedPatient = await api.put(
             `/patients/${patientToEdit.id}`,
             data
@@ -33,19 +38,15 @@ const PatientModal = ({ patientToEdit, onClose, onSave }) => {
         } else {
             savedPatient = await api.post('/patients', data);
         }
-        
-// Llamamos a la función onSave del padre con el paciente guardado
         onSave(savedPatient);
-
         } catch (error) {
         console.error('Error al guardar el paciente:', error);
+        setApiError(error.message || 'Error al guardar. Intente de nuevo.');
         }
     };
 
     return (
-        // Backdrop (fondo oscuro)
         <div className="modal-backdrop" onClick={onClose}>
-        {/* Contenido (caja blanca) */}
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             
             <h3>{isEditMode ? 'Editar Paciente' : 'Crear Nuevo Paciente'}</h3>
@@ -77,10 +78,22 @@ const PatientModal = ({ patientToEdit, onClose, onSave }) => {
             </div>
 
             <div className="form-group">
-                <label>Teléfono (Opcional)</label>
-                <input {...register('phone')} />
+                <label>Fecha de Nacimiento</label>
+                <input
+                type="date"
+                {...register('fecha_nacimiento')}
+                />
             </div>
 
+            <div className="form-group">
+                <label>Obra Social</label>
+                <input
+                {...register('obra_social')}
+                />
+            </div>
+
+            {apiError && <p className="error-message">{apiError}</p>}
+            
             <div className="modal-actions">
                 <button type="submit" className="btn">
                 {isEditMode ? 'Guardar Cambios' : 'Crear Paciente'}
@@ -94,6 +107,6 @@ const PatientModal = ({ patientToEdit, onClose, onSave }) => {
         </div>
         </div>
     );
-};
+    };
 
 export default PatientModal;

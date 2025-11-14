@@ -3,11 +3,9 @@ import { useForm } from 'react-hook-form';
 import { api } from '../services/api';
 
 const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
-    console.log('--- DoctorModal RENDERIZADO ---', { doctorToEdit });
-
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
-    
     const [apiError, setApiError] = useState(null);
+
     const isEditMode = Boolean(doctorToEdit);
 
     useEffect(() => {
@@ -18,13 +16,13 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
         reset({
             first_name: '',
             last_name: '',
-            specialty: ''
+            specialty: '',
+            matricula_profesional: ''
         });
         }
     }, [doctorToEdit, reset, isEditMode]);
 
     const onSubmit = async (data) => {
-        console.log('--- onSubmit LLAMADO ---', data);
         setApiError(null); 
         try {
         let savedDoctor;
@@ -38,12 +36,10 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
         }
         onSave(savedDoctor); 
         } catch (error) {
-        console.error('Error al guardar el médico (API):', error);
+        console.error('Error al guardar el médico:', error);
         setApiError(error.message || 'Error al guardar. Intente de nuevo.');
         }
     };
-
-    console.log('ERRORES DE FORMULARIO:', errors);
 
     return (
         <div className="modal-backdrop" onClick={onClose}>
@@ -77,6 +73,13 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
                 {errors.specialty && <p className="error-message">{errors.specialty.message}</p>}
             </div>
 
+            <div className="form-group">
+                <label>Matrícula Profesional</label>
+                <input
+                {...register('matricula_profesional')}
+                />
+            </div>
+
             {apiError && <p className="error-message">{apiError}</p>}
             
             <div className="modal-actions">
@@ -92,6 +95,6 @@ const DoctorModal = ({ doctorToEdit, onClose, onSave }) => {
         </div>
         </div>
     );
-};
+    };
 
 export default DoctorModal;
